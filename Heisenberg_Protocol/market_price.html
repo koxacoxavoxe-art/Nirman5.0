@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   Market Price | YieldWise
+  </title>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+  <link href="style.css" rel="stylesheet">
+   <!-- Optional page-specific stylesheet (uncomment if you place content into market_price.css) -->
+   <!-- <link rel="stylesheet" href="market_price.css" /> -->
+   <script src="https://cdn.tailwindcss.com">
+   </script>
+   <script>
+    tailwind.config = {
+    darkMode: 'class'
+};
+   </script>
+   <link crossorigin="anonymous" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-y7fQ2lGBeuJ1d5I7cQbZl1f8O2A1uAwm6WQyd9Zk9RCiM08pV6xY3kA6o8+SBeWwCmf8v1M3bqvFfwlFjQKMWA==" referrerpolicy="no-referrer" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts">
+    </script>
+    <style>
+     /* Page-specific CSS (can be placed into market_price.css) */
+    html, body { font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+    .loading-spinner { width: 28px; height: 28px; border: 3px solid #e5e7eb; border-top-color: #2E7D32; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .stat-value { font-variant-numeric: tabular-nums; }
+    /* ApexCharts theme tweaks */
+    .apexcharts-tooltip { font-family: 'Poppins', sans-serif !important; }
+    #priceTrendChart .apexcharts-toolbar { gap: 6px; }
+    /* Dark mode card adjustments */
+    .dark .card { background-color: #111827; color: #e5e7eb; }
+    .dark .card-header, .dark .card-footer { background-color: #1f2937; color: #e5e7eb; }
+    </style>
+   </link>
+  </link>
+ 
+<!-- CSS Loader Script -->
+<script src="./css_loader.js"></script>
+</head>
+ <body class="bg-gray-50 text-gray-900">
+  <!-- Header (as provided; links converted to relative .html format; logo has error fallback) -->
+  <header class="w-full bg-white border-b border-[#2E7D32] sticky top-0 z-50">
+   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex h-16 items-center justify-between">
+     <div class="flex items-center gap-3">
+      <img alt="YeildWise" class="h-9 w-auto" onerror="this.onerror=null;this.src='https://ibb.co/JW4DnZwH'" src="https://i.ibb.co/p68Y2qBd/Logo-02.png"/>
+      <span class="text-xl font-semibold text-[#2E7D32]">
+       Market Price
+      </span>
+     </div>
+     <div class="flex-1 max-w-lg mx-6 hidden md:block">
+      <div class="relative">
+       <input class="w-full border border-gray-300 rounded-md pl-10 pr-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#2E7D32] focus:border-[#2E7D32]" placeholder="Search crop (e.g., Wheat, Rice)..." type="text"/>
+       <i class="fas fa-search absolute left-3 top-2.5 text-gray-400">
+       </i>
+      </div>
+     </div>
+     <div class="flex items-center gap-2">
+      <a class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-[#2E7D32] rounded-md hover:opacity-90" href="./market_price.html?tool=profit">
+       <i class="fas fa-calculator">
+       </i>
+       Profit Estimator
+      </a>
+      <button class="p-2 rounded hover:bg-gray-100" title="Notifications">
+       <i class="fas fa-bell text-gray-700">
+       </i>
+      </button>
+      <details class="relative">
+       <summary class="list-none cursor-pointer flex items-center gap-2">
+        <img alt="User" class="h-8 w-8 rounded-full" onerror="this.onerror=null;this.src='https://ibb.co/RpZL1PWH'" src="https://i.ibb.co/XZNm9pTJ/Default-male-avatar.webp">
+         <span class="text-sm text-gray-700">
+          Farmer
+         </span>
+         <i class="fas fa-chevron-down text-gray-500">
+         </i>
+        </img>
+       </summary>
+       <div class="absolute right-0 mt-2 w-52 bg-white border border-gray-200 rounded-md shadow-lg">
+        <a class="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="./home_dashboard.html">
+         <i class="fas fa-home mr-2">
+         </i>
+         Home
+        </a>
+        <a class="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="./farmer_profile.html">
+         <i class="fas fa-user mr-2">
+         </i>
+         Profile
+        </a>
+        <div class="border-t border-gray-200">
+        </div>
+        <a class="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#">
+         <i class="fas fa-sign-out-alt mr-2">
+         </i>
+         Logout
+        </a>
+       </div>
+      </details>
+     </div>
+    </div>
+   </div>
+  </header>
+  <div class="flex">
+   <!-- Sidebar (left) - use provided HTML, keep design and links; add active state for current page) -->
+   <aside class="hidden md:block w-64 bg-white border-r border-gray-200 min-h-screen pt-4 px-2" id="sidebar-market">
+    <nav class="space-y-2">
+     <h3 class="px-3 text-xs font-semibold text-gray-500 uppercase">
+      Market Insights
+     </h3>
+     <a aria-current="page" class="group flex items-center gap-3 px-3 py-2 text-gray-700 rounded-md hover:bg-green-50 hover:text-[#2E7D32] bg-green-50 text-[#2E7D32] font-semibold" href="./market_price.html">
+      <i class="fas fa-chart-line text-[#2E7D32]">
+      </i>
+      <span>
+       Market Price
+      </span>
+     </a>
+     <details class="px-3 py-2 rounded-md">
+      <summary class="flex items-center gap-3 cursor-pointer text-gray-700 hover:text-[#2E7D32]">
+       <i class="fas fa-cubes text-[#2E7D32]">
+       </i>
+       <span>
+        Tools
+       </span>
+      </summary>
+      <div class="mt-2 ml-6 space-y-1">
+       <a class="block px-2 py-1 text-sm text-gray-600 hover:text-[#2E7D32]" href="./market_price.html?tool=profit">
+        <i class="fas fa-calculator mr-2">
+        </i>
+        Profit Estimator
+       </a>
+       <a class="block px-2 py-1 text-sm text-gray-600 hover:text-[#2E7D32]" href="./market_price.html?view=trend">
+        <i class="fas fa-chart-area mr-2">
+        </i>
+        3-Month Trend
+       </a>
+      </div>
+     </details>
+     <a class="group flex items-center gap-3 px-3 py-2 text-gray-700 rounded-md hover:bg-green-50 hover:text-[#2E7D32]" href="./home_dashboard.html">
+      <i class="fas fa-home text-[#2E7D32]">
+      </i>
+      <span>
+       Back to Home
+      </span>
+     </a>
+    </nav>
+   </aside>
+   <!-- Main Content Area -->
+   <main class="flex-1 min-h-screen">
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+     <!-- Top controls: Crop Selector, Language, Dark Mode Toggle -->
+     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div class="flex items-center gap-3">
+       <label class="text-sm font-medium text-gray-700" for="cropSelect">
+        Select Crop
+       </label>
+       <select class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#2E7D32] focus:border-[#2E7D32]" id="cropSelect">
+        <!-- options populated by JS -->
+       </select>
+      </div>
+      <div class="flex items-center gap-3">
+       <div class="flex items-center gap-2">
+        <label class="text-sm font-medium text-gray-700" for="langSelect">
+         Language
+        </label>
+        <select class="border border-gray-300 rounded-md px-2 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#2E7D32] focus:border-[#2E7D32]" id="langSelect">
+         <option value="en">
+          English
+         </option>
+         <option value="hi">
+          हिंदी
+         </option>
+         <option value="mr">
+          मराठी
+         </option>
+        </select>
+       </div>
+       <button class="inline-flex items-center gap-2 px-3 py-2 text-sm text-gray-700 border border-gray-300 rounded-md hover:bg-gray-100" id="darkToggle" type="button">
+        <i class="fas fa-moon">
+        </i>
+        <span>
+         Dark Mode
+        </span>
+       </button>
+      </div>
+     </div>
+     <!-- Two-column: Market Data (left) and Trend Chart (right) -->
+     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+      <!-- Market Data Display Card -->
+      <div class="card border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+       <div class="card-header px-4 py-3 bg-gray-50 border-b border-gray-200">
+        <h2 class="text-base font-semibold text-gray-800" id="marketDataTitle">
+         Market Data
+        </h2>
+       </div>
+       <div class="p-4 space-y-4">
+        <div class="flex items-center justify-between">
+         <div>
+          <div class="text-sm text-gray-600" id="currentPriceLabel">
+           Current Market Price
+          </div>
+          <div class="text-2xl font-bold text-[#2E7D32] stat-value" id="currentPriceValue">
+           ₹ --
+          </div>
+         </div>
+         <div class="text-right">
+          <div class="text-sm text-gray-600" id="mspLabel">
+           Minimum Support Price (MSP)
+          </div>
+          <div class="text-xl font-semibold text-gray-800 stat-value" id="mspValue">
+           ₹ --
+          </div>
+         </div>
+        </div>
+        <div class="flex items-center gap-2 text-sm text-gray-600">
+         <i class="fas fa-info-circle text-gray-500">
+         </i>
+         <span id="marketNote">
+          Prices are indicative and may vary across markets.
+         </span>
+        </div>
+        <div class="flex items-center gap-2">
+         <button class="inline-flex items-center gap-2 px-3 py-2 text-sm text-white bg-[#2E7D32] rounded-md hover:opacity-90" id="readAloudBtn">
+          <i class="fas fa-volume-up">
+          </i>
+          <span id="readAloudText">
+           Read Aloud Summary
+          </span>
+         </button>
+        </div>
+       </div>
+      </div>
+      <!-- Price Trend Chart Card -->
+      <div class="card border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+       <div class="card-header px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
+        <h2 class="text-base font-semibold text-gray-800" id="trendTitle">
+         3-Month Price Trend
+        </h2>
+        <div class="text-xs text-gray-600" id="trendSubtitle">
+         Last 3 months
+        </div>
+       </div>
+       <div class="p-4">
+        <div class="flex items-center justify-center py-10" id="chartLoading">
+         <div aria-label="Loading chart" class="loading-spinner">
+         </div>
+        </div>
+        <div class="w-full" id="priceTrendChart" style="min-height: 280px;">
+        </div>
+       </div>
+      </div>
+     </div>
+     <!-- Regional Market Prices Table -->
+     <div class="card border border-gray-200 rounded-lg overflow-hidden shadow-sm mt-6">
+      <div class="card-header px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
+       <h2 class="text-base font-semibold text-gray-800" id="regionalPricesTitle">
+        Regional Market Prices
+       </h2>
+       <div class="flex items-center gap-2">
+        <input class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#2E7D32] focus:border-[#2E7D32]" id="marketFilter" placeholder="Filter by market/state..." type="text">
+         <button class="px-3 py-2 text-sm text-gray-700 border border-gray-300 rounded-md hover:bg-gray-100" id="resetFilter">
+          <i class="fas fa-rotate-left">
+          </i>
+         </button>
+        </input>
+       </div>
+      </div>
+      <div class="p-4 overflow-x-auto">
+       <table class="min-w-full border border-gray-200 rounded-lg overflow-hidden">
+        <thead class="bg-gray-50">
+         <tr>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider cursor-pointer" data-sort="market">
+           Market
+           <i class="fas fa-sort ml-2 text-gray-400">
+           </i>
+          </th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider cursor-pointer" data-sort="state">
+           State
+           <i class="fas fa-sort ml-2 text-gray-400">
+           </i>
+          </th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider cursor-pointer" data-sort="date">
+           Date
+           <i class="fas fa-sort ml-2 text-gray-400">
+           </i>
+          </th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider cursor-pointer" data-sort="price">
+           Price (₹/Qtl)
+           <i class="fas fa-sort ml-2 text-gray-400">
+           </i>
+          </th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+           Source
+          </th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+           Action
+          </th>
+         </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200" id="marketsTbody">
+        </tbody>
+       </table>
+       <div class="flex items-center justify-between mt-3 text-sm text-gray-600">
+        <div id="paginationInfo">
+         Showing 1–6 of 6 entries
+        </div>
+        <div>
+         Sorted by:
+         <span id="sortedBy">
+          -
+         </span>
+        </div>
+       </div>
+      </div>
+     </div>
+     <!-- Profit Estimator -->
+     <div class="card border border-gray-200 rounded-lg overflow-hidden shadow-sm mt-6" id="profitEstimator">
+      <div class="card-header px-4 py-3 bg-gray-50 border-b border-gray-200">
+       <h2 class="text-base font-semibold text-gray-800" id="profitEstimatorTitle">
+        Profit Estimator
+       </h2>
+      </div>
+      <div class="p-4 grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+       <div>
+        <label class="block text-sm font-medium text-gray-700" for="productionCost" id="productionCostLabel">
+         Total Production Cost
+        </label>
+        <input class="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#2E7D32] focus:border-[#2E7D32]" id="productionCost" min="0" placeholder="e.g., 15000" type="number"/>
+        <p class="mt-1 text-xs text-gray-500">
+         Enter total cost in INR
+        </p>
+       </div>
+       <div>
+        <label class="block text-sm font-medium text-gray-700" for="expectedYield" id="expectedYieldLabel">
+         Expected Yield (in Quintals)
+        </label>
+        <input class="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#2E7D32] focus:border-[#2E7D32]" id="expectedYield" min="0" placeholder="e.g., 10" type="number"/>
+        <p class="mt-1 text-xs text-gray-500">
+         Enter in Qtl
+        </p>
+       </div>
+       <div class="flex items-end gap-2">
+        <button class="w-full inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#2E7D32] rounded-md hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed" disabled="" id="calcProfitBtn">
+         <i class="fas fa-calculator">
+         </i>
+         <span id="calcBtnText">
+          Calculate Profit
+         </span>
+        </button>
+       </div>
+       <div class="md:col-span-3">
+        <div class="flex items-center gap-2 text-sm text-gray-700">
+         <i class="fas fa-wallet text-[#2E7D32]">
+         </i>
+         <span id="estimatedProfitLabel">
+          Estimated Profit:
+         </span>
+         <strong class="text-[#2E7D32]" id="estimatedProfitValue">
+          —
+         </strong>
+        </div>
+        <p class="text-xs text-gray-500 mt-1">
+         Formula: (Expected Yield × Current Market Price) − Production Cost
+        </p>
+       </div>
+      </div>
+     </div>
+     <!-- Feedback/Notifications area (non-intrusive) -->
+     <div class="mt-4 hidden" id="notifArea">
+      <div class="alert-info border border-blue-300 bg-blue-50 text-blue-700 px-4 py-2 rounded-md">
+       Notification placeholder
+      </div>
+     </div>
+    </section>
+   </main>
+  </div>
+  <!-- Footer (provided) -->
+  <footer class="w-full bg-white border-t border-gray-200">
+   <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+     <img alt="Logo" class="h-5 w-5" onerror="this.onerror=null;this.src='https://ibb.co/JW4DnZwH'" src="https://i.ibb.co/p68Y2qBd/Logo-02.png"/>
+     <span class="text-sm text-gray-600">
+      Market Insights
+     </span>
+    </div>
+    <div class="flex items-center gap-4">
+     <a class="text-sm text-gray-600 hover:text-[#2E7D32]" href="./market_price.html?view=current">
+      <i class="fas fa-tags mr-1">
+      </i>
+      Current Price
+     </a>
+     <a class="text-sm text-gray-600 hover:text-[#2E7D32]" href="./market_price.html?view=trend">
+      <i class="fas fa-chart-area mr-1">
+      </i>
+      Trend
+     </a>
+     <a class="text-sm text-gray-600 hover:text-[#2E7D32]" href="./market_price.html?tool=profit">
+      <i class="fas fa-calculator mr-1">
+      </i>
+      Estimator
+     </a>
+     <span class="mx-2 text-gray-300">
+      |
+     </span>
+     <a class="text-sm text-gray-600 hover:text-[#2E7D32]" href="./tools_page.html">
+      Terms
+     </a>
+     <a class="text-sm text-gray-600 hover:text-[#2E7D32]" href="./tools_page.html">
+      Privacy
+     </a>
+    </div>
+   </div>
+  </footer>
+  <!-- Scripts: Data, Logic, Interactions -->
+  <script>
+   // Dummy offline crop data store
+const cropDataStore = {
+    Wheat: {
+        msp: 2125,
+        current: 2250,
+        trend: [2100, 2200, 2250],
+        labels: ['Sep', 'Oct', 'Nov'],
+        markets: [{
+            market: 'Azadpur Mandi',
+            state: 'Delhi',
+            date: '2025-11-10',
+            price: 2265,
+            source: 'AgriExchange'
+        }, {
+            market: 'Vashi APMC',
+            state: 'Maharashtra',
+            date: '2025-11-11',
+            price: 2290,
+            source: 'AGMARKNET'
+        }, {
+            market: 'K R Market',
+            state: 'Karnataka',
+            date: '2025-11-08',
+            price: 2210,
+            source: 'State Board'
+        }, {
+            market: 'Bakshi Ka Talab',
+            state: 'Uttar Pradesh',
+            date: '2025-11-07',
+            price: 2245,
+            source: 'District Mandi'
+        }, {
+            market: 'Sangrur Mandi',
+            state: 'Punjab',
+            date: '2025-11-06',
+            price: 2275,
+            source: 'State Board'
+        }, {
+            market: 'Chandni Chowk',
+            state: 'Delhi',
+            date: '2025-11-09',
+            price: 2230,
+            source: 'AgriExchange'
+        }]
+    },
+    Rice: {
+        msp: 2183,
+        current: 2400,
+        trend: [2300, 2350, 2400],
+        labels: ['Sep', 'Oct', 'Nov'],
+        markets: [{
+            market: 'Chennai Mandi',
+            state: 'Tamil Nadu',
+            date: '2025-11-10',
+            price: 2385,
+            source: 'AGMARKNET'
+        }, {
+            market: 'Hyderabad Mandi',
+            state: 'Telangana',
+            date: '2025-11-11',
+            price: 2410,
+            source: 'AgriExchange'
+        }, {
+            market: 'Howrah Market',
+            state: 'West Bengal',
+            date: '2025-11-09',
+            price: 2390,
+            source: 'State Board'
+        }, {
+            market: 'Raipur Mandi',
+            state: 'Chhattisgarh',
+            date: '2025-11-08',
+            price: 2365,
+            source: 'District Mandi'
+        }, {
+            market: 'Patna Market',
+            state: 'Bihar',
+            date: '2025-11-07',
+            price: 2375,
+            source: 'State Board'
+        }, {
+            market: 'Guwahati Mandi',
+            state: 'Assam',
+            date: '2025-11-06',
+            price: 2350,
+            source: 'AgriExchange'
+        }]
+    },
+    Maize: {
+        msp: 1970,
+        current: 2050,
+        trend: [1900, 1980, 2050],
+        labels: ['Sep', 'Oct', 'Nov'],
+        markets: [{
+            market: 'Indore Mandi',
+            state: 'Madhya Pradesh',
+            date: '2025-11-10',
+            price: 2040,
+            source: 'AGMARKNET'
+        }, {
+            market: 'Nizamabad APMC',
+            state: 'Telangana',
+            date: '2025-11-11',
+            price: 2060,
+            source: 'AgriExchange'
+        }, {
+            market: 'Pune Market',
+            state: 'Maharashtra',
+            date: '2025-11-09',
+            price: 2035,
+            source: 'State Board'
+        }, {
+            market: 'Jaipur Mandi',
+            state: 'Rajasthan',
+            date: '2025-11-08',
+            price: 2020,
+            source: 'District Mandi'
+        }, {
+            market: 'Kanpur Market',
+            state: 'Uttar Pradesh',
+            date: '2025-11-07',
+            price: 2010,
+            source: 'State Board'
+        }, {
+            market: 'Bhubaneswar Mandi',
+            state: 'Odisha',
+            date: '2025-11-06',
+            price: 1995,
+            source: 'AgriExchange'
+        }]
+    },
+    Cotton: {
+        msp: 6620,
+        current: 7100,
+        trend: [6800, 7000, 7100],
+        labels: ['Sep', 'Oct', 'Nov'],
+        markets: [{
+            market: 'Rajkot Mandi',
+            state: 'Gujarat',
+            date: '2025-11-10',
+            price: 7050,
+            source: 'AGMARKNET'
+        }, {
+            market: 'Nagpur Market',
+            state: 'Maharashtra',
+            date: '2025-11-11',
+            price: 7120,
+            source: 'AgriExchange'
+        }, {
+            market: 'Warangal APMC',
+            state: 'Telangana',
+            date: '2025-11-09',
+            price: 7085,
+            source: 'State Board'
+        }, {
+            market: 'Coimbatore Market',
+            state: 'Tamil Nadu',
+            date: '2025-11-08',
+            price: 7090,
+            source: 'District Mandi'
+        }, {
+            market: 'Bhatinda Mandi',
+            state: 'Punjab',
+            date: '2025-11-07',
+            price: 7075,
+            source: 'State Board'
+        }, {
+            market: 'Surat Market',
+            state: 'Gujarat',
+            date: '2025-11-06',
+            price: 7060,
+            source: 'AgriExchange'
+        }]
+    },
+    Soybean: {
+        msp: 4710,
+        current: 4950,
+        trend: [4600, 4800, 4950],
+        labels: ['Sep', 'Oct', 'Nov'],
+        markets: [{
+            market: 'Ujjain Mandi',
+            state: 'Madhya Pradesh',
+            date: '2025-11-10',
+            price: 4900,
+            source: 'AGMARKNET'
+        }, {
+            market: 'Latur APMC',
+            state: 'Maharashtra',
+            date: '2025-11-11',
+            price: 4970,
+            source: 'AgriExchange'
+        }, {
+            market: 'Jalna Market',
+            state: 'Maharashtra',
+            date: '2025-11-09',
+            price: 4925,
+            source: 'State Board'
+        }, {
+            market: 'Kota Mandi',
+            state: 'Rajasthan',
+            date: '2025-11-08',
+            price: 4890,
+            source: 'District Mandi'
+        }, {
+            market: 'Indore Market',
+            state: 'Madhya Pradesh',
+            date: '2025-11-07',
+            price: 4880,
+            source: 'State Board'
+        }, {
+            market: 'Akola Market',
+            state: 'Maharashtra',
+            date: '2025-11-06',
+            price: 4860,
+            source: 'AgriExchange'
+        }]
+    },
+    Sugarcane: {
+        msp: 315,
+        current: 350,
+        trend: [320, 330, 350],
+        labels: ['Sep', 'Oct', 'Nov'],
+        markets: [{
+            market: 'Meerut Mandi',
+            state: 'Uttar Pradesh',
+            date: '2025-11-10',
+            price: 345,
+            source: 'AGMARKNET'
+        }, {
+            market: 'Kolhapur Market',
+            state: 'Maharashtra',
+            date: '2025-11-11',
+            price: 355,
+            source: 'AgriExchange'
+        }, {
+            market: 'Muzaffarnagar APMC',
+            state: 'Uttar Pradesh',
+            date: '2025-11-09',
+            price: 350,
+            source: 'State Board'
+        }, {
+            market: 'Belgaum Market',
+            state: 'Karnataka',
+            date: '2025-11-08',
+            price: 342,
+            source: 'District Mandi'
+        }, {
+            market: 'Gurdaspur Mandi',
+            state: 'Punjab',
+            date: '2025-11-07',
+            price: 348,
+            source: 'State Board'
+        }, {
+            market: 'Ahmednagar Market',
+            state: 'Maharashtra',
+            date: '2025-11-06',
+            price: 340,
+            source: 'AgriExchange'
+        }]
+    }
+};
+
+const cropsList = Object.keys(cropDataStore);
+const el = {
+    cropSelect: document.getElementById('cropSelect'),
+    currentPriceValue: document.getElementById('currentPriceValue'),
+    mspValue: document.getElementById('mspValue'),
+    priceTrendChart: document.getElementById('priceTrendChart'),
+    chartLoading: document.getElementById('chartLoading'),
+    marketsTbody: document.getElementById('marketsTbody'),
+    sortedBy: document.getElementById('sortedBy'),
+    marketFilter: document.getElementById('marketFilter'),
+    resetFilter: document.getElementById('resetFilter'),
+    productionCost: document.getElementById('productionCost'),
+    expectedYield: document.getElementById('expectedYield'),
+    calcProfitBtn: document.getElementById('calcProfitBtn'),
+    estimatedProfitValue: document.getElementById('estimatedProfitValue'),
+    readAloudBtn: document.getElementById('readAloudBtn'),
+    darkToggle: document.getElementById('darkToggle'),
+    langSelect: document.getElementById('langSelect'),
+    labels: {
+        marketDataTitle: document.getElementById('marketDataTitle'),
+        currentPriceLabel: document.getElementById('currentPriceLabel'),
+        mspLabel: document.getElementById('mspLabel'),
+        marketNote: document.getElementById('marketNote'),
+        trendTitle: document.getElementById('trendTitle'),
+        trendSubtitle: document.getElementById('trendSubtitle'),
+        regionalPricesTitle: document.getElementById('regionalPricesTitle'),
+        profitEstimatorTitle: document.getElementById('profitEstimatorTitle'),
+        productionCostLabel: document.getElementById('productionCostLabel'),
+        expectedYieldLabel: document.getElementById('expectedYieldLabel'),
+        calcBtnText: document.getElementById('calcBtnText'),
+        estimatedProfitLabel: document.getElementById('estimatedProfitLabel'),
+        readAloudText: document.getElementById('readAloudText')
+    }
+};
+
+const langStrings = {
+    en: {
+        marketDataTitle: 'Market Data',
+        currentPriceLabel: 'Current Market Price',
+        mspLabel: 'Minimum Support Price (MSP)',
+        marketNote: 'Prices are indicative and may vary across markets.',
+        trendTitle: '3-Month Price Trend',
+        trendSubtitle: 'Last 3 months',
+        regionalPricesTitle: 'Regional Market Prices',
+        profitEstimatorTitle: 'Profit Estimator',
+        productionCostLabel: 'Total Production Cost',
+        expectedYieldLabel: 'Expected Yield (in Quintals)',
+        calcBtnText: 'Calculate Profit',
+        estimatedProfitLabel: 'Estimated Profit:',
+        readAloudText: 'Read Aloud Summary'
+    },
+    hi: {
+        marketDataTitle: 'बाज़ार डेटा',
+        currentPriceLabel: 'वर्तमान बाज़ार मूल्य',
+        mspLabel: 'न्यूनतम समर्थन मूल्य (MSP)',
+        marketNote: 'कीमतें संकेतात्मक हैं और मंडियों में भिन्न हो सकती हैं।',
+        trendTitle: '3 माह मूल्य प्रवृत्ति',
+        trendSubtitle: 'पिछले 3 महीने',
+        regionalPricesTitle: 'क्षेत्रीय मंडी मूल्य',
+        profitEstimatorTitle: 'लाभ कैलकुलेटर',
+        productionCostLabel: 'कुल उत्पादन लागत',
+        expectedYieldLabel: 'अनुमानित पैदावार (क्विंटल में)',
+        calcBtnText: 'लाभ गणना करें',
+        estimatedProfitLabel: 'अनुमानित लाभ:',
+        readAloudText: 'आवाज में पढ़ें'
+    },
+    mr: {
+        marketDataTitle: 'बाजार डेटा',
+        currentPriceLabel: 'चालू बाजारभाव',
+        mspLabel: 'किमान आधार किंमत (MSP)',
+        marketNote: 'किंमती अंदाजे आहेत आणि बाजारानुसार बदलू शकतात.',
+        trendTitle: '३ महिने किंमत प्रवाह',
+        trendSubtitle: 'गेल्या ३ महिने',
+        regionalPricesTitle: 'प्रादेशिक बाजारभाव',
+        profitEstimatorTitle: 'नफा गणक',
+        productionCostLabel: 'एकूण उत्पादन खर्च',
+        expectedYieldLabel: 'अपेक्षित उत्पादन (क्विंटलमध्ये)',
+        calcBtnText: 'नफा काढा',
+        estimatedProfitLabel: 'अनुमानित नफा:',
+        readAloudText: 'आवाजात वाचा'
+    }
+};
+
+let state = {
+    selectedCrop: 'Wheat',
+    chart: null,
+    marketsData: [],
+    sortKey: null,
+    sortAsc: true,
+    lang: 'en'
+};
+
+function formatINR(n) {
+    try {
+        return new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: 'INR',
+            maximumFractionDigits: 0
+        }).format(n);
+    } catch (e) {
+        return `₹ ${n}`;
+    }
+}
+
+function formatDate(d) {
+    const dt = new Date(d);
+    return dt.toLocaleDateString('en-IN', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+}
+
+function populateCrops() {
+    cropsList.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        el.cropSelect.appendChild(opt);
+    });
+    el.cropSelect.value = state.selectedCrop;
+}
+
+function applyLanguage(lang) {
+    const strings = langStrings[lang] || langStrings.en;
+    Object.keys(strings).forEach(k => {
+        el.labels[k].textContent = strings[k];
+    });
+}
+
+function updateMarketCards() {
+    const c = cropDataStore[state.selectedCrop];
+    el.currentPriceValue.textContent = formatINR(c.current);
+    el.mspValue.textContent = formatINR(c.msp);
+}
+
+function initOrUpdateChart() {
+    const c = cropDataStore[state.selectedCrop];
+    const options = {
+        chart: {
+            type: 'line',
+            height: 300,
+            toolbar: {
+                show: true,
+                tools: {
+                    zoom: true,
+                    zoomin: true,
+                    zoomout: true,
+                    pan: true,
+                    reset: true
+                }
+            },
+            animations: {
+                enabled: true
+            }
+        },
+        series: [{
+            name: state.selectedCrop,
+            data: c.trend
+        }],
+        xaxis: {
+            categories: c.labels
+        },
+        colors: ['#2E7D32'],
+        stroke: {
+            curve: 'smooth',
+            width: 3
+        },
+        markers: {
+            size: 4,
+            colors: ['#2E7D32'],
+            strokeColors: '#fff',
+            strokeWidth: 2
+        },
+        tooltip: {
+            theme: 'light',
+            y: {
+                formatter: v => `${formatINR(v)}/Qtl`
+            }
+        },
+        grid: {
+            borderColor: '#e5e7eb'
+        }
+    };
+    el.chartLoading.classList.add('hidden');
+    if (!state.chart) {
+        state.chart = new ApexCharts(el.priceTrendChart, options);
+        state.chart.render();
+    } else {
+        state.chart.updateOptions({
+            xaxis: {
+                categories: c.labels
+            }
+        });
+        state.chart.updateSeries([{
+            name: state.selectedCrop,
+            data: c.trend
+        }]);
+    }
+}
+
+function renderMarketsTable() {
+    const c = cropDataStore[state.selectedCrop];
+    state.marketsData = c.markets.slice();
+    applyFilterAndSort();
+}
+
+function applyFilterAndSort() {
+    const term = (el.marketFilter.value || '').toLowerCase();
+    let rows = state.marketsData.filter(r =>
+        r.market.toLowerCase().includes(term) || r.state.toLowerCase().includes(term)
+    );
+    if (state.sortKey) {
+        rows.sort((a, b) => {
+            let va = a[state.sortKey],
+                vb = b[state.sortKey];
+            if (state.sortKey === 'date') {
+                va = new Date(va).getTime();
+                vb = new Date(vb).getTime();
+            }
+            if (state.sortKey === 'market' || state.sortKey === 'state') {
+                va = va.toLowerCase();
+                vb = vb.toLowerCase();
+            }
+            if (va < vb) return state.sortAsc ? -1 : 1;
+            if (va > vb) return state.sortAsc ? 1 : -1;
+            return 0;
+        });
+    }
+    el.sortedBy.textContent = state.sortKey ? `${state.sortKey} (${state.sortAsc ? 'asc' : 'desc'})` : '-';
+    el.marketsTbody.innerHTML = '';
+    rows.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-gray-50';
+        tr.innerHTML = `
+          <td class="px-4 py-2 text-sm">${r.market}</td>
+          <td class="px-4 py-2 text-sm">${r.state}</td>
+          <td class="px-4 py-2 text-sm">${formatDate(r.date)}</td>
+          <td class="px-4 py-2 text-sm">${r.price}</td>
+          <td class="px-4 py-2 text-sm">${r.source}</td>
+          <td class="px-4 py-2 text-sm">
+            <button class="text-[#2E7D32] hover:underline" onclick="Swal.fire({ title: 'Market Detail', html: '<b>${r.market}</b><br/>${r.state}<br/>Date: ${formatDate(r.date)}<br/>Price: ${formatINR(r.price)} / Qtl', icon: 'info' })">View</button>
+          </td>`;
+        el.marketsTbody.appendChild(tr);
+    });
+    document.getElementById('paginationInfo').textContent = `Showing 1–${rows.length} of ${rows.length} entries`;
+}
+
+function validateEstimator() {
+    const cost = parseFloat(el.productionCost.value);
+    const yieldQ = parseFloat(el.expectedYield.value);
+    const valid = Number.isFinite(cost) && cost >= 0 && Number.isFinite(yieldQ) && yieldQ > 0;
+    el.calcProfitBtn.disabled = !valid;
+}
+
+function calculateProfit() {
+    const c = cropDataStore[state.selectedCrop];
+    const cost = parseFloat(el.productionCost.value);
+    const yieldQ = parseFloat(el.expectedYield.value);
+    const revenue = yieldQ * c.current;
+    const profit = revenue - cost;
+    el.estimatedProfitValue.textContent = formatINR(profit);
+    Swal.fire({
+        title: 'Estimated Profit',
+        html: `<div style="text-align:left">Crop: <b>${state.selectedCrop}</b><br/>Current Price: <b>${formatINR(c.current)}/Qtl</b><br/>Yield: <b>${yieldQ} Qtl</b><br/>Revenue: <b>${formatINR(revenue)}</b><br/>Production Cost: <b>${formatINR(cost)}</b><hr/>Profit: <b>${formatINR(profit)}</b></div>`,
+        icon: profit >= 0 ? 'success' : 'warning',
+        confirmButtonText: 'OK',
+    });
+}
+
+function readSummary() {
+    const c = cropDataStore[state.selectedCrop];
+    const profitText = el.estimatedProfitValue.textContent && el.estimatedProfitValue.textContent !== '—' ? ` Estimated profit is ${el.estimatedProfitValue.textContent}.` : '';
+    const text = `${state.selectedCrop} current market price is ${formatINR(c.current)} per quintal. MSP is ${formatINR(c.msp)}.${profitText}`;
+    try {
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = state.lang === 'hi' ? 'hi-IN' : state.lang === 'mr' ? 'mr-IN' : 'en-IN';
+        speechSynthesis.cancel();
+        speechSynthesis.speak(utter);
+    } catch (e) {
+        console.warn('TTS not supported');
+    }
+}
+
+function initSortHandlers() {
+    document.querySelectorAll('th[data-sort]').forEach(th => {
+        th.addEventListener('click', () => {
+            const key = th.getAttribute('data-sort');
+            if (state.sortKey === key) {
+                state.sortAsc = !state.sortAsc;
+            } else {
+                state.sortKey = key;
+                state.sortAsc = true;
+            }
+            applyFilterAndSort();
+        });
+    });
+}
+
+function initEvents() {
+    el.cropSelect.addEventListener('change', () => {
+        state.selectedCrop = el.cropSelect.value;
+        updateMarketCards();
+        initOrUpdateChart();
+        renderMarketsTable();
+        el.estimatedProfitValue.textContent = '—';
+    });
+    el.marketFilter.addEventListener('input', applyFilterAndSort);
+    el.resetFilter.addEventListener('click', () => {
+        el.marketFilter.value = '';
+        applyFilterAndSort();
+    });
+    el.productionCost.addEventListener('input', validateEstimator);
+    el.expectedYield.addEventListener('input', validateEstimator);
+    el.calcProfitBtn.addEventListener('click', () => {
+        const cost = parseFloat(el.productionCost.value);
+        const yieldQ = parseFloat(el.expectedYield.value);
+        if (!(Number.isFinite(cost) && cost >= 0 && Number.isFinite(yieldQ) && yieldQ > 0)) {
+            Swal.fire({
+                title: 'Invalid Input',
+                text: 'Please enter valid positive numbers for cost and yield.',
+                icon: 'error'
+            });
+            return;
+        }
+        calculateProfit();
+    });
+    el.readAloudBtn.addEventListener('click', readSummary);
+    el.darkToggle.addEventListener('click', () => {
+        const root = document.documentElement;
+        root.classList.toggle('dark');
+    });
+    el.langSelect.addEventListener('change', () => {
+        state.lang = el.langSelect.value;
+        applyLanguage(state.lang);
+    });
+}
+
+function initPage() {
+    populateCrops();
+    applyLanguage(state.lang);
+    updateMarketCards();
+    initOrUpdateChart();
+    renderMarketsTable();
+    initSortHandlers();
+    initEvents();
+}
+
+document.addEventListener('DOMContentLoaded', initPage);
+  </script>
+ </body>
+</html>
